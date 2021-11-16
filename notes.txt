@@ -1,0 +1,36 @@
+GameObject;
+  All game objects are drawn according to their x y and z(layer) positions.
+  Objects on the same Z must be drawn in order for proper overlapping?
+
+Scene
+  A collection of game objects that make up the background/foreground visuals.
+
+  /*Actor specs
+  //numerical (8)
+    Health 2 bytes
+    spirit 1 bytes
+    walk speed 1 byte
+    run speed 1 byte
+    dash speed 1 byte
+    air dash speed 1 byte
+    jump power 1 byte
+    jumps 1 byte
+  //activeValues (7)
+    health 2 bytes
+     spirit, xspeed, yspeed, blockdirection
+    jumps, stunCount
+  //states (14)
+    attacking
+    blocking - blockdirection
+    crouching
+    jumping
+    landing
+    dashing
+    walking
+    running
+    onland
+    onWallLeft
+    onWallRight
+    downed
+    stunned
+  */

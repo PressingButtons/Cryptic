@@ -1,0 +1,7 @@
+{
+  "test": [
+    {"url": "skybox_test.png", "px": 1.0, "py": 1.0},
+    {"url": "background_test.png", "px": 0.1, "py": 0.0},
+    {"url": "inground_test.png", "px": 0.0, "py": 0.0}
+  ]
+}
