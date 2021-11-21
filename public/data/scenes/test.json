@@ -1,0 +1,6 @@
+{
+  "name": "test",
+  "layers": [
+    {"url": "scene/test", "px": 0, "py": 0, "depth":0}
+  ]
+}

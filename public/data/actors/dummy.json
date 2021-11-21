@@ -1,0 +1,13 @@
+{
+  "name": "dummy",
+  "width": 128,
+  "height": 128,
+  "image" : "actors/dummy",
+  "requirements": ["ball"],
+  "frames": [
+    {"x": 0, "y": 0, "width": 128, "height": 128, "body": {"x": 45, "y": 29, "width": 38, "height": 83}, "hitboxes": [], "hurtboxes": []}
+  ],
+  "animations" : {
+    "idle": {"frames": [{"index": 0, "duation": 166}]}
+  }
+}

@@ -1,0 +1,1 @@
+const GRAVITY_VALUE = 10;

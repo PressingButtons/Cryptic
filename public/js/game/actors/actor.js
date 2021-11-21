@@ -1,9 +1,9 @@
 import GameObject from './gameobject.js';
 
-const Actor = function(width, height, spec, frameData) {
-  GameObject.call(this, width, height);
+const Actor = function(obj) {
+  GameObject.call(this, obj.width, obj.height);
   this.data = new Int16Array(32);
-  this.setSpecs(spec);
+  this.unpack(obj);
   this.resetStates( );
 }
 
@@ -59,6 +59,57 @@ Object.defineProperties(Actor.prototype, {
   onLand: {value: this.data[24]},
   onWallLeft: {value: this.data[25]},
   onWallRight: {value: this.data[26]},
+  //
+  currentFrame: {value: this.data[27]},
+  currentAnimation: {value: null},
+  elapsedFrameTime: {value: this.data[28]},
+  frameIndex: {value: this.data[29]}
 })
+
+Actor.prototype.unpack = function(data) {
+  this.frames = data.frames;
+  this.parseAnimations(data.animations);
+  this.setSpecs(data.specs);
+  this.currentFrame = {index: 0, duration: 0};
+}
+
+Actor.prototype.parseAnimations = function(animations) {
+  this.animations = animations;
+  for(var name in animations) {
+    const animation = animations[name];
+    if(animation.onAnimationEnd) animation.onAnimationEnd = new Function(this, animation.onAnimationEnd);
+    for(const frame of animation) {
+      if(frame.onFunc) frame.onFrame = new Function(this, frame.onFrame);
+    }
+  }
+}
+
+Actor.prototype.animate = function(dt) {
+  if(this.currentAnimation == null) { this.elapsedFrameTime = 0; return; }
+  this.elapsedFrameTime += dt;
+  if(this.elapsedFrameTime > this.currentFrame.duration) {
+    this.elapsedFrameTime = 0;
+    this.frameIndex++;
+    if(this.frameIndex > this.currentAnimation.frames.length) {
+      this.currentAnimation.onAnimationEnd(this);
+      this.gotoAnimation(this.currentAnimation.name);
+    } else {
+      this.currentFrame = this.currentAnimation.frames[this.frameIndex];
+      if(this.currentFrame.onFrame) this.currentFrame.onFrame(this);
+    }
+  }
+}
+
+Actor.prototype.gotoAnimation = function(aKey) {
+  this.currentAnimation = this.animations[aKey];
+  this.currentFrame = this.currentAnimation.frames[0];
+  if(this.currentFrame.onFrame) this.currentFrame.onFrame(this);
+  this.elapsedFrameTime = 0;
+  this.frameIndex = 0;
+}
+
+Actor.prototype.update = function(dt) {
+  this.animate(dt);
+}
 
 export default Actor;

@@ -1,21 +1,17 @@
-import * as GameLib from '../game/gamelib.js';
+import * as Game from '../game/game.js';
 let worker = new Worker('/public/js/workers/vertexworker.js');
 
 const main = ( ) => {
-  GameLib.glCreate(document.getElementById('canvas')).then(onCreate);
+  //GameLib.glCreate(document.getElementById('canvas')).then(onCreate);
+  onCreate(null);
 }
 
 const onCreate = glShader => {
-  const camera = glMartix.mat4.create( );
-  GameLib.TextureCache.init(glShader.gl);
-
-  GameLib.compile(['test'], 'prototype')
-
+  Game.create(['dummy', 'dummy'], 'test').then(onGameCreate);
 }
 
-const testEntity = function(width, height, color) {
-  GameLib.GameObject.call(this, width, height);
+const onGameCreate = ( ) => {
+  Game.run( );
 }
-
 
 export default main;

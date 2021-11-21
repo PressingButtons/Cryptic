@@ -1,0 +1,14 @@
+{
+  "name": "ball",
+  "width": 128,
+  "height": 128,
+  "image" : "actors/ball",
+  "requirements": [],
+  "frames": [
+    {
+      "x": 0, "y": 0, "width": 48, "height": 48, "body": {"x": 16, "y": 16, "width": 16, "height":16},
+      "hitboxes": [{"x": 16, "y": 16, "width": 16, "height": 16}],
+      "hurtboxes": []
+    }
+  ]
+}
