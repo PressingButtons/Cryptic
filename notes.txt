@@ -34,3 +34,20 @@ Scene
     downed
     stunned
   */
+
+
+Thoughts on Game system
+
+Game is the overarching system (1 unique instance)
+  - holds UIControllers (4)
+  - holds Graphics
+  - generates GameMatches
+  - loads Object Data
+
+Match - system over battles
+  - holds object list
+  - holds match rules
+  - records win loss record if matchtype is valid
+  - prototype for specific match types(?)
+
+UIController -

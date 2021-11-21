@@ -1,7 +1,7 @@
-import GameObject from './gameobject.js';
+import * as GameObjectLib from './gameobject.js';
 
-const DisplayBuffer = function(elementLength) {
-  const buffer = new Int16Array(elementLength);
+const DisplayBuffer = function(instanceLength) {
+  const buffer = new Int16Array(instanceLength * GameObjectLib.vertexLength);
   let   elementsUsed = 0;
 
   const clear = ( ) => {
@@ -12,10 +12,10 @@ const DisplayBuffer = function(elementLength) {
   const write = (...gameobjects) => {
     gameobjects = [].concat.apply([], gameobjects);
     for(let i = 0; i < gameobjects.length; i++) {
-      if(!gamobjects[i] instanceof GameObject) throw `Error - Display Buffer can only take GameObjects.\nCannot write ${typeof gameobjects[i]} into DisplayBuffer`;
+      if(!gamobjects[i] instanceof GameObjectLib.GameObject) throw `Error - Display Buffer can only take GameObjects.\nCannot write ${typeof gameobjects[i]} into DisplayBuffer`;
       const g = gameobjects[i];
       buffer.set(g.vertexData, elementsUsed);
-      elementsUsed += g.vertexData.length;
+      elementsUsed += GameObjectLib.vertexLength;
     }
   }
 
@@ -29,7 +29,7 @@ const DisplayBuffer = function(elementLength) {
       return elementsUsed * buffer.BYTES_PER_ELEMENT;
     },
     get getNumInstances( ) {
-      return elementsUsed / DATA_VERTEX;
+      return elementsUsed/GameObjectLib.vertexLength;
     }
   }
 

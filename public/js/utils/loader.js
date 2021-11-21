@@ -34,7 +34,7 @@ const loadSubActors = (name, pkg) => {
 
 const loadActors = actorReq => {
   let promises = actorReq.map( ar => loadActor(ar));
-  return Promise.all(promises);//.then(combineActorPackages);
+  return Promise.all(promises).then(combineActorPackages);
 }
 
 const combineActorPackages = results => {

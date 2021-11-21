@@ -7,7 +7,7 @@ const main = ( ) => {
 }
 
 const onCreate = glShader => {
-  Game.create(['dummy', 'dummy'], 'test').then(onGameCreate);
+  Game.compile(['dummy', 'dummy'], 'test').then(onGameCreate);
 }
 
 const onGameCreate = ( ) => {

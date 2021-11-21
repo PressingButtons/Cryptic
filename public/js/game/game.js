@@ -1,11 +1,25 @@
+import World from './world.js';
+import Graphics from './graphics.js';
 import * as loader from '../utils/loader.js';
 
 let world;
 
+l
+
 const createWorld = objects => {
-  world = new World( );
+  let cache = getTextures(objects[0], objects[1]);
+  world = new World(objects[0]);
   initActors(objects[0]);
-  initScene(objects[1));
+  initScene(objects[1]);
+}
+
+const getTextures = (...objects) => {
+  let cache = { };
+  for(const it of objects) {
+    for(let key in it) {
+      cache[key] =
+    }
+  }
 }
 
 const setGameCache = objects => {

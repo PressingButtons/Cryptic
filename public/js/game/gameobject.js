@@ -1,5 +1,7 @@
+const vertexLength = 8;
+
 const GameObject = function(width, height) {
-  this.vertexData = new Int16Array(10);
+  this.vertexData = new Int16Array(vertexLength);
   this.colorData = new Float32Array(4);
   this.width = width;
   this.height = height;
@@ -50,3 +52,4 @@ Object.defineProperties(GameObject.prototype, {
 })
 
 export default GameObject
+export vertexLength;

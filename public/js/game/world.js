@@ -1,9 +1,11 @@
 import DisplayBuffer from './displayBuffer.js';
 import Physics from './physics.js';
+import Spawner from './spawner.js';
 
-const World = function( ) {
-  this.displayBuffer = new DisplayBuffer(1024);
-  this.cache = { };
+const World = function(actorDefs, textures) {
+  this.displayBuffer = new DisplayBuffer(100);
+  this.spawner = Spawner.create(actorDefs);
+  this.cache = textures;
   this.layers = [
     null, //skybox
     [], //backgrounds
@@ -32,4 +34,11 @@ World.prototype.getDisplayData = function( ) {
 
 World.prototype.update = function(dt) {
   //Physics.update(dt, this.gameobjects);
+}
+
+World.prototype.spawnActor = function(name, x = 0, y = y) {
+  let actor = this.spawner.spawn(name);
+  actor.x = x; actor.y = y;
+  this.gameobjects.push(actor);
+  return actor;
 }

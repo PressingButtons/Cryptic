@@ -3,7 +3,7 @@ let Gamepads = {};
 //LISTENERS
 const keyboardListener = event => {
   let state = event.type == "keydown";
-  let event_data = {type: 'keyboard', pressed: state, value: event.key.toLowerCase(), index: -1 }
+  let event_data = {type: 'keyboard', pressed: state, key: event.key.toLowerCase(), index: -1 }
   document.dispatchEvent(new CustomEvent('gameinput', {detail: event_data}))
 }
 
@@ -20,7 +20,7 @@ const onGamepadDisconnect = index => {
 const checkButtons = gamepad => {
   Gamepads[gamepad.index].buttons.forEach((button, i) => {
     if(!button.pressed && gamepad.buttons[i].pressed || button.pressed && !gamepad.buttons[i].pressed) {
-      let event_data = {type: 'gamepad', pressed: gamepad.buttons[i].pressed, value: i, index: gamepad.index }
+      let event_data = {type: 'gamepad', pressed: gamepad.buttons[i].pressed, button: i, index: gamepad.index }
       document.dispatchEvent(new CustomEvent('gameinput', {detail: event_data}));
     }
   });
