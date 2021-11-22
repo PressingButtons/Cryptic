@@ -20,7 +20,7 @@ const onGamepadDisconnect = index => {
 const checkButtons = gamepad => {
   Gamepads[gamepad.index].buttons.forEach((button, i) => {
     if(!button.pressed && gamepad.buttons[i].pressed || button.pressed && !gamepad.buttons[i].pressed) {
-      let event_data = {type: 'gamepad', pressed: gamepad.buttons[i].pressed, button: i, index: gamepad.index }
+      let event_data = {type: 'gamepad', pressed: gamepad.buttons[i].pressed, key: i, index: gamepad.index }
       document.dispatchEvent(new CustomEvent('gameinput', {detail: event_data}));
     }
   });
