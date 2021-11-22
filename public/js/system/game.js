@@ -10,5 +10,3 @@ const gameController = {
   2: new UIController( ),
   3: new UIController( )
 }
-
-let match =

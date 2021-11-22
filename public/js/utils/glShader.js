@@ -75,6 +75,6 @@ export default function glCreate(canvas) {
   glShader.gl = canvas.getContext('webgl', {premultipliedAlpha: false});
   enableAlpha(glShader.gl);
   return Promise.all([
-    compile('standard', '/public/data/vertex.glsl', '/public/data/fragment.glsl')
+    compile('standard', '/public/data/shaders/vertex.glsl', '/public/data/shaders/fragment.glsl')
   ]).then(( ) => {return glShader})
 }

@@ -1,9 +1,10 @@
-import {glCreate} from './glshader.js'
+import glCreate from '../utils/glshader.js'
 //
 const OBJECT_VERTEX_SIZE = 24;
 let glShader;
 
-const initProgram = glShader => {
+const initProgram = result => {
+  glShader = result
   glShader.gl.useProgram(glShader.shaders.standard.program);
 }
 
@@ -29,13 +30,13 @@ const drawLayer = (layer, bufferData, textureCache) => {
 }
 
 const drawObjects = (objects, bufferData, textureCache) => {
-  let (i = 0; i < objects.length; i++) {
+  for(let i = 0; i < objects.length; i++) {
     let data = bufferData.slic(i * OBJECT_VERTEX_SIZE, i * OBJECT_VERTEX_SIZE + OBJECT_VERTEX_SIZE);
     drawVertexAndTexture(data, textureCache(objects[i].texture), object.tint);
   }
 }
 
-//
+//shou
 export const init = canvas => {
   return glCreate(canvas).then(initProgram);
 }

@@ -1,5 +1,7 @@
 import * as UIController from '../system/uicontroller.js';
 import * as GameInput from '../utils/events/gameinput.js';
+import * as Loader from '../utils/loader.js'
+import * as Graphics from '../system/graphics.js'
 
 const keyboardBinds = {
   "w": "d1",
@@ -20,19 +22,28 @@ const controllers = [];
 let uic;
 
 const main = ( ) => {
+  Graphics.init($('#canvas')[0]).then(onInit);
+}
+
+const onInit = ( ) => {
   let kc = new UIController.UIController( );
   kc.bind(UIController.KEYBOARD, keyboardBinds);
   let gc = new UIController.UIController( );
   gc.bind(UIController.GAMEPAD0, gamepadBinds);
   controllers.push(kc, gc);
-  console.log(controllers);
   readInput( );
   GameInput.init( );
+  Loader.loadAssets(Graphics.createTexture, 'actors/dummy').then(onAssetsLoaded);
 }
+
+const onAssetsLoaded = assets => {
+  console.log(assets)
+}
+
+
 
 const readInput = timestamp => {
   $('.debug').html('');
-  console.log(controllers[1].buttons.d1.active);
   for(let i = 0; i < controllers.length; i++) {
     let container = document.createElement('div');
     let controller = controllers[i];

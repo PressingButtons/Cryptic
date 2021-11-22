@@ -11,57 +11,46 @@ const loadImage = url => {
   });
 }
 
-const loadActor = (actorName, pkg = { }) => {
-  if(pkg[actorName]) return pkg;
-  return loadData(`actors/${actorName}`)
-  .then( data => loadImageAndPackageActor(data, pkg))
-  .then( name => loadSubActors(name, pkg));
+const loadAsset = (name, pkg = {}) => {
+  if(pkg[name]) return pkg;
+  return loadData(name)
+  .then(obj => loadImageAndCatalogActor(obj, pkg))
+  .then(pName => loadSubAsset(pName, pkg))
 }
 
 
-const loadImageAndPackageActor = (data, pkg) => {
-  return loadImage(data.image).then( image => {
-    pkg[data.name] = {data: data, texture: image};
-    return data.name;
+const loadImageAndCatalogActor = (obj, pkg) => {
+  let promises = obj.images.map(i => loadImage(i))
+  return Promise.all(promises)
+  .then(images => {
+    pkg[obj.data.name] = {data: obj.data, images: images};
+    return obj.data.name;
   })
 }
 
-const loadSubActors = (name, pkg) => {
+const loadSubAsset = (name, pkg) => {
   if(!pkg[name].data.requirements || pkg[name].data.requirements.length == 0) return pkg;
-  let promises = pkg[name].data.requirements.map(x => loadActor(x, pkg));
+  let promises = pkg[name].data.requirements.map(x => loadAsset(x, pkg));
   return Promise.all(promises)
 }
 
-const loadActors = actorReq => {
-  let promises = actorReq.map( ar => loadActor(ar));
-  return Promise.all(promises).then(combineActorPackages);
+const loadAssets = (func, ...names) => {
+  let list = new Set(names), pkg = {};
+  let promises = [...list].map(name => loadAsset(name, pkg));
+  return Promise.all(promises).then(( ) => generateCache(func, pkg));
 }
 
-const combineActorPackages = results => {
-  let pkgs = [].concat.apply([], results);
-  if(pkgs.length > 1) {
-    for(var i = 1; i < pkgs.length; i++) {
-      Object.assign(pkgs[0], pkgs[i]);
+const generateCache = (createTexture, objects) => {
+  let pkg = {objects: {}, textures: {}}
+  for(let entry in objects) {
+    pkg.objects[entry] = objects[entry].data;
+    for(const img of objects[entry].images) {
+      let name = img.src.substring(img.src.lastIndexOf('/') + 1).split('.')[0];
+      pkg.textures[name] = createTexture(img);
     }
   }
-  return pkgs[0];
-}
-
-const loadScene = sceneReq => {
-  return loadData(`scenes/${sceneReq}`)
-  .then(data => {
-    let promises = data.layers.map(layer => loadImage(layer.url));
-    return Promise.all(promises).then( images => {
-      data.textures = images;
-      return data;
-    })
-  })
-}
-
-const loadAssets = (actorRequest, sceneRequest) => {
-  actorRequest = [...new Set(actorRequest)];
-  return Promise.all([loadActors(actorRequest), loadScene(sceneRequest)]);
+  return pkg;
 }
 
 //exports
-export {loadAssets, loadScene, loadActors, loadData}
+export {loadAssets, loadData, loadImage}
