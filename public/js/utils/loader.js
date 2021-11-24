@@ -1,8 +1,8 @@
-const loadData = url => {
+export const loadData = url => {
   return fetch(`/public/data/${url}.json`).then(response => response.json());
 }
 
-const loadImage = url => {
+export const loadImage = url => {
   return new Promise(function(resolve, reject) {
     let image = new Image( );
     image.onload = event => {resolve(image)};
@@ -11,6 +11,34 @@ const loadImage = url => {
   });
 }
 
+const catalogData = (name, data, pkg) => {
+  pkg[name] = data;
+  return { requirements: data.requirements, pkg: pkg };
+}
+
+const loadObject = (name, pkg = {}) => {
+  if(pkg.hasOwnProperty(name)) return pkg;
+  return loadData(name)
+  .then(data => catalogData(name, data, pkg))
+  .then(loadSubObjects)
+}
+
+const loadSubObjects = req => {
+  if(!req.requirements || req.requirements.length == 0) return req.pkg;
+  let promises = req.requirements.map(r => loadObject(r, req.pkg));
+  return Promise.all(promises);
+}
+
+
+export const loadObjects = (...names) => {
+  names = [].concat.apply([], names);
+  let pkg = {};
+  let loadList = new Set(names);
+  let promises = [...loadList].map(entry => loadObject(entry, pkg));
+  return Promise.all(promises).then(() => {return pkg});
+}
+
+/*
 const loadAsset = (name, pkg = {}) => {
   if(pkg[name]) return pkg;
   return loadData(name)
@@ -46,11 +74,9 @@ const generateCache = (createTexture, objects) => {
     pkg.objects[entry] = objects[entry].data;
     for(const img of objects[entry].images) {
       let name = img.src.substring(img.src.lastIndexOf('/') + 1).split('.')[0];
-      pkg.textures[name] = createTexture(img);
+      pkg.textures[name] =  {texture: createTexture(img), width: img.width, height: img.height};
     }
   }
   return pkg;
 }
-
-//exports
-export {loadAssets, loadData, loadImage}
+*/

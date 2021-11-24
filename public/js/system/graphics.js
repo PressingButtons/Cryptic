@@ -1,11 +1,13 @@
 import glCreate from '../utils/glshader.js'
 //
 const OBJECT_VERTEX_SIZE = 24;
-let glShader;
+let gl, shaders;
+let buffer;
 
 const initProgram = result => {
-  glShader = result
-  glShader.gl.useProgram(glShader.shaders.standard.program);
+  gl = result.gl;
+  buffer = gl.createBuffer( );
+  shaders = result.shaders;
 }
 
 const invokeAttribute = (gl, attribute, size, stride, offset, byte_length = Float32Array.BYTES_PER_ELEMENT) => {
@@ -14,59 +16,44 @@ const invokeAttribute = (gl, attribute, size, stride, offset, byte_length = Floa
 }
 
 //drawing methods
-const drawVertexAndTexture = (vertexData, textureData, color = [1, 1, 1, 1]) => {
-  const gl = glShader.gl, shader = glShader.shaders.standard;
-  gl.bindTexture(gl.TEXTURE_2D, textureData.texture);
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexData);
-  gl.invokeAttribute(gl, shader.attributes.position, 2, 8, 0);
-  gl.invokeAttribute(gl, shader.attributes.textureCoord, 2, 8, 2);
-  gl.invokeAttribute(gl, shader.attributes.color, 4, 8, 4);
+const clear = (color = [0, 0, 0, 1]) => {
+  const gl = glShader.gl;
+  gl.clearColor(color[0], color[1], color[2], color[3]);
+  gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
+}
+
+const drawData = (bufferData, shader, texture, color, perspective) => {
+  //inject buffer data
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, bufferData, gl.STATIC_DRAW);
+  invokeAttribute(gl, shader.attributes.position, 2, 2, 0);
+  //set texture data
+  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
+  gl.bufferData(gl.ARRAY_BUFFER, object.textureVertex, gl.STATIC_DRAW);
+  invokeAttribute(gl, shader.attributes.textureCoord, 2, 2, 0);
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.uniform2fv(shader.uniforms.textureSize, texture.dimensions);
+  //set color
+  gl.uniform4fv(shader.uniforms.color, color)
+  //set perspective matrix
+  gl.uniformMatrix4fv(shader.uniforms.matrix, false, perspective);
+  //draw
   gl.drawArrays(gl.TRIANGLES, 0, 6);
 }
 
-const drawLayer = (layer, bufferData, textureCache) => {
-  if(layer.texture) drawVertexAndTexture(bufferData, textureCache[layer.texture], layer.color);
-  else drawObjects(layer.objects, bufferData, textureCache);
-}
-
-const drawObjects = (objects, bufferData, textureCache) => {
+//exports
+export const drawObjects = (objects, bufferData textureCache, perspective) => {
+  clear( );
+  gl.useProgram(shaders.standard);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
   for(let i = 0; i < objects.length; i++) {
-    let data = bufferData.slic(i * OBJECT_VERTEX_SIZE, i * OBJECT_VERTEX_SIZE + OBJECT_VERTEX_SIZE);
-    drawVertexAndTexture(data, textureCache(objects[i].texture), object.tint);
+    let objectData = bufferData.slice(i, i * OBJECT_VERTEX_SIZE + i);
+    drawData(objectData, shaders.standard, textureCache[objects[i].texture], perspective);
   }
 }
 
-//shou
 export const init = canvas => {
   return glCreate(canvas).then(initProgram);
 }
 
-export const createTexture = image => {
-  const gl = glShader.gl;
-  let texture = gl.createTexture( );
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  // set parameter to render image at any size
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
-  //upload image to the texture
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, image);
-  return texture;
-}
-
-export const getContext = ( ) => {
-  return glShader.gl || null;
-}
-
-export const drawGameWorld = world => {
-  for(let i = 0; i < world.layers.length; i++) {
-    const layer = world.layers[i];
-    const offset = getOffset(world.layers, i);
-    drawLayer(layer, world.bufferData.slice(offset, offset + layer.length * OBJECT_VERTEX_SIZE), world.textureCache);
-  }
-}
-
-export const drawScene = scene => {
-
-}
+export gl;

@@ -1,11 +1,17 @@
-import DisplayBuffer from './displayBuffer.js';
 import Physics from './physics.js';
-import Spawner from './spawner.js';
 
-const World = function(actorDefs, textures) {
-  this.displayBuffer = new DisplayBuffer(100);
-  this.spawner = Spawner.create(actorDefs);
-  this.cache = textures;
+const cleanLayers = layers => {
+  for(const layer of layers) {
+    for(const entry of layer) {
+      if(entry == null) layer.splice(layer.indexOf(entry), 1);
+    }
+  }
+}
+
+const World = function(width, height) {
+  this.width = width;
+  this.height = height;
+  this.floor = height - 50;
   this.layers = [
     null, //skybox
     [], //backgrounds
@@ -19,26 +25,28 @@ const World = function(actorDefs, textures) {
     skybox: {value: this.layers[0]},
     backgrounds: {value: this.layers[1]},
     particles1:  {value: this.layers[2]},
-    gameobjects: {value: this.layers[3]},
+    actors: {value: this.layers[3]},
     particles2:  {value: this.layers[4]},
     foregrounds: {value: this.layers[5]},
   })
 }
 
-World.prototype.getDisplayData = function( ) {
-  let objects = [].concat.apply([], this.layers);
-  this.displayBuffer.clear( );
-  this.displayBuffer.write(objects);
-  return this.displayBuffer.usedBufferData;
+World.prototype.getObjects = function( ) {
+  return [].concat.apply([], this.layers);
+}
+
+World.prototype.getDisplayVertex = function( ) {
+  let objects = this.getObjects( );
+  return objects.map(obj => obj.vertexData.slice(0))
 }
 
 World.prototype.update = function(dt) {
   //Physics.update(dt, this.gameobjects);
+  cleanLayers(this.layers);
 }
 
-World.prototype.spawnActor = function(name, x = 0, y = y) {
-  let actor = this.spawner.spawn(name);
-  actor.x = x; actor.y = y;
-  this.gameobjects.push(actor);
-  return actor;
+World.prototype.addActor = function(actor) {
+  this.actors.push(actor);
 }
+
+export default World;

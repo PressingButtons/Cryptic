@@ -1,4 +1,4 @@
-import Dummy from './dummy';
+import Dummy from './dummy.js';
 
 export {
   Dummy as dummy

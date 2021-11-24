@@ -1,0 +1,26 @@
+{
+  "texture": {
+    "vertex": "./codebase/shaders/texture_vertex.glsl",
+    "fragment": "./codebase/shaders/texture_fragment.glsl",
+    "attributes": {
+      "position": "aPosition",
+      "textureCoord": "aTextCoord"
+    },
+    "uniforms": {
+      "textureSize": "uTextSize",
+      "matrix": "uMatrix",
+      "color": "uColor"
+    }
+  },
+  "shape": {
+    "vertex": "./codebase/shaders/shape_vertex.glsl",
+    "fragment": "./codebase/shaders/shape_fragment.glsl",
+    "attributes": {
+      "position": "aPosition"
+    },
+    "uniforms": {
+      "matrix": "uMatrix",
+      "color": "uColor"
+    }
+  }
+}

@@ -1,13 +1,11 @@
 self.importScripts('/public/js/gl-matrix.js');
 
 const VERTEX_LENGTH = 24,
-      BUFFER_INSTANCE_LENGTH = 10;
-      LE = true,
-      STAGE_WIDTH = 800,
-      STAGE_HEIGHT = 450,
+      BUFFER_INSTANCE_LENGTH = 9;
       mat4 = glMatrix.mat4,
       vec4 = glMatrix.vec4;
 
+let stageW = 800, stageH = 450;
 let createView = (buffer, offset) => {
   return {
     wid: buffer[offset + 0],
@@ -22,11 +20,6 @@ let createView = (buffer, offset) => {
   }
 }
 
-self.onmessage = msg => {
-  let buffers = createBuffers(msg.data);
-  postMessage(buffers, [buffers])
-}
-
 const createBuffers = (buffer) => {
   let bufferData = new Int16Array(buffer);
   const numInstances = bufferData.length/BUFFER_INSTANCE_LENGTH;
@@ -35,19 +28,19 @@ const createBuffers = (buffer) => {
     const offset = i * BUFFER_INSTANCE_LENGTH;
     const view = createView(bufferData, offset)
     //create matrix centered at origin
-    let matrix = mat4.fromTranslation(mat4.create(), [STAGE_WIDTH/2, STAGE_HEIGHT/2, 0]);
+    let matrix = mat4.fromTranslation(mat4.create(), [stageW/2, stageH/2, 0]);
     //rotate matrix according to object
-    mat4.rotateX(matrix, matrix, view.rx);
-    mat4.rotateY(matrix, matrix, view.ry);
-    mat4.rotateZ(matrix, matrix, view.rz);
+    mat4.rotateX(matrix, matrix, view.rx * Math.PI/180);
+    mat4.rotateY(matrix, matrix, view.ry * Math.PI/180);
+    mat4.rotateZ(matrix, matrix, view.rz * Math.PI/180);
     //move matrix in respect to center of object
     mat4.translate(matrix, matrix, [-view.wid/2, -view.hgt/2, 0]);
     //anchor current translation (origin)
     let p1 = vec4.transformMat4(vec4.create(), [0, 0, 0, 1], matrix),
         p2 = vec4.transformMat4(vec4.create(), [view.wid, view.hgt, 0, 1], matrix);
     //transform back to object original position
-    let xOrigin = -STAGE_WIDTH/2 + view.wid/2 + view.x,
-        yOrigin = -STAGE_HEIGHT/2 + view.hgt/2 + view.y;
+    let xOrigin = -stageW/2 + view.wid/2 + view.x,
+        yOrigin = -stageH/2 + view.hgt/2 + view.y;
     p1 = vec4.add(p1, p1, [xOrigin, yOrigin, 0, 0]).slice(0, 2);
     p2 = vec4.add(p2, p2, [xOrigin, yOrigin, 0, 0]).slice(0, 2);
     //create frame coordinates
@@ -70,4 +63,14 @@ const createVertex = (p1, p2, f1, f2) => {
     p2[0], p2[1], f2[0], f2[1],
     p2[0], p1[1], f2[0], f1[1]
   ]
+}
+
+self.onmessage = msg => {
+  if(msg.data.init) {
+    stageW = msg.init.stageW;
+    stageH = msg.init.stageH;
+  } else {
+    let buffers = createBuffers(msg.data);
+    postMessage(buffers, [buffers])
+  }
 }

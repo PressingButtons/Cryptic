@@ -11,6 +11,9 @@ const convertToPath = url => {
 }
 
 app.use('/public', express.static('./public'));
+app.use('/codebase', express.static('./codebase'));
+app.use('/assets', express.static('./assets'));
+app.use('/data', express.static('./data'));
 
 app.get('/', (req, res) => {
   let url = convertToPath('index.html');

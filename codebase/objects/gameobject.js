@@ -1,4 +1,4 @@
-const vertexLength = 8;
+export const vertexLength = 9;
 
 const GameObject = function(width, height) {
   this.vertexData = new Int16Array(vertexLength);
@@ -6,6 +6,7 @@ const GameObject = function(width, height) {
   this.width = width;
   this.height = height;
   this.rgba = [1, 1, 1, 1];
+  this.texture;
 }
 
 Object.defineProperties(GameObject.prototype, {
@@ -51,5 +52,4 @@ Object.defineProperties(GameObject.prototype, {
   }
 })
 
-export default GameObject
-export vertexLength;
+export default GameObject;
