@@ -1,6 +1,7 @@
 self.importScripts('/public/js/gl-matrix.js');
 
-const VERTEX_LENGTH = 24,
+//const VERTEX_LENGTH = 24,
+const VERTEX_LENGTH = 12,
       BUFFER_INSTANCE_LENGTH = 9;
       mat4 = glMatrix.mat4,
       vec4 = glMatrix.vec4;
@@ -23,7 +24,8 @@ let createView = (buffer, offset) => {
 const createBuffers = (buffer) => {
   let bufferData = new Int16Array(buffer);
   const numInstances = bufferData.length/BUFFER_INSTANCE_LENGTH;
-  let outBuffer = new Float32Array(numInstances * VERTEX_LENGTH)
+  let posBuffer = new Float32Array(numInstances * VERTEX_LENGTH);
+  let texBuffer = new Float32Array(numInstances * VERTEX_LENGTH);
   for(let i = 0; i < numInstances; i++ ) {
     const offset = i * BUFFER_INSTANCE_LENGTH;
     const view = createView(bufferData, offset)
@@ -48,20 +50,18 @@ const createBuffers = (buffer) => {
         f2 = [view.dx + view.wid, view.dy + view.hgt];
     //f1 = [0, 0];
     //f2 = [1, 1]
-    let vertex = createVertex(p1, p2, f1, f2);
-    outBuffer.set(vertex, i * VERTEX_LENGTH);
+    let vertex = createVertex(p1, p2);
+    posBuffer.set(vertex, i * VERTEX_LENGTH);
+    vertex = createVertex(f1, f2);
+    texBuffer.set(vertex, i * VERTEX_LENGTH);
   }
-  return outBuffer.buffer;
+  return [posBuffer.buffer, texBuffer.buffer];
 }
 
-const createVertex = (p1, p2, f1, f2) => {
+const createVertex = (v1, v2) => {
   return [
-    p1[0], p1[1], f1[0], f1[1],
-    p2[0], p1[1], f2[0], f1[1],
-    p1[0], p2[1], f1[0], f2[1],
-    p1[0], p2[1], f1[0], f2[1],
-    p2[0], p2[1], f2[0], f2[1],
-    p2[0], p1[1], f2[0], f1[1]
+    v1[0], v1[1], v2[0], v1[1], v1[0], v2[1],
+    v1[0], v2[1], v2[0], v2[1], v2[0], v1[1]
   ]
 }
 
@@ -71,6 +71,6 @@ self.onmessage = msg => {
     stageH = msg.init.stageH;
   } else {
     let buffers = createBuffers(msg.data);
-    postMessage(buffers, [buffers])
+    postMessage(buffers, [buffers[0], buffers[1]])
   }
 }
