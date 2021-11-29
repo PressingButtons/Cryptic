@@ -21,6 +21,10 @@ canvas{
   background: black;
 }
 
+p, h1, h2, h3, h4, h5, h6 {
+  margin: 6px;
+}
+
 .debug {
   position: absolute;
   top: 10px;
@@ -32,4 +36,13 @@ canvas{
 
 .debug > div {
   margin: 5px;
+}
+
+.inputR {
+  height: 400px;
+  overflow-y: hidden;
+}
+
+.flex {
+  display: flex;
 }

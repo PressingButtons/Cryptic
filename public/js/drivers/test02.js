@@ -1,9 +1,10 @@
 import * as System from '/codebase/system/system.js';
 import * as Loader from '/codebase/utils/load.js';
-import Person from '/codebase/objects/person.js';
 import * as UIController from '/codebase/system/uicontroller.js';
 import * as GameInput from '/codebase/events/gameinput.js';
 import * as Debug from '/public/js/utils/debug.js';
+import Person from '/codebase/objects/person.js';
+import InputReader from '/codebase/system/inputreader.js';
 
 GameInput.init( );
 
@@ -37,12 +38,18 @@ const test = ( ) => {
     14: "d3",
     15: "d4",
     4:  "l1",
-    5:  "r1"
+    5:  "r1",
+    0:  "f1",
+    1:  "f2",
+    2:  "f3",
+    3:  "f4"
   }
 
   let left = false, right = false;
 
   let cnt = new UIController.UIController( );
+
+  let ir = new InputReader(cnt);
 
   cnt.bind(UIController.GAMEPAD0, map);
 
@@ -113,16 +120,19 @@ const test = ( ) => {
   const run = currentTime => {
     if(!lastTime) lastTime = currentTime;
     let dt = (currentTime - lastTime) * 0.0001;
-    $('.debug').html('');
     readController(cnt);
     updateObjects(objects, dt);
-    //psuedoPhysics(objects, dt)
+    //psuedoPhysics(objects, dt);
+    const canvas = document.getElementById('canvas');
     camera.setDimensions(canvas.width, canvas.height);
     System.Graphics.drawObjects(displaybuffer.getBufferData(), camera.getProjection(), objects);
-    reportObjects(objects);
+    //reportObjects(objects);
+    //reportLog(ir);
+    ir.update(performance.now());
     lastTime = currentTime;
     requestAnimationFrame(run);
   }
+  setInterval(reporting, 300, ir, objects);
 
   Loader.loadImage('entities/dummy')
   .then(image => {
@@ -181,10 +191,20 @@ const collideBodies = (a, b) => {
   //b.top = centerY;
 }
 
+const reporting = (ir, objects) => {
+  $('.debug').html('');
+  reportObjects(objects);
+  reportLog(ir);
+}
+
 const reportObjects = objects => {
   for(let i = 0; i < objects.length; i++) {
     Debug.reportProperty(i, objects[i], 'x', 'y', 'speed_x', 'speed_y');
   }
+}
+
+const reportLog = ir => {
+  Debug.reportLog(ir.log);
 }
 
 export default main;
